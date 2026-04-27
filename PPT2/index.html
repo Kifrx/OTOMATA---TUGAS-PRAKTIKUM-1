@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexical Analyzer Pro</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Lexical Analyzer Pro</h1>
+            <p>Alat analisis leksikal otomatis untuk bahasa Python dan C/C++</p>
+        </header>
+
+        <main>
+            <section class="card">
+                <div class="card-title">
+                    Input Program
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="languageSelect">Bahasa Pemrograman</label>
+                        <select id="languageSelect">
+                            <option value="C / C++">C / C++</option>
+                            <option value="Python">Python</option>
+                        </select>
+                    </div>
+                    <button id="analyzeBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                        Ekstrak Token
+                    </button>
+                </div>
+                <textarea id="codeInput" placeholder="Tempelkan kode Anda di sini... (Contoh: int a = 10;)"></textarea>
+            </section>
+
+            <section id="resultsSection" class="card results-section">
+                <div class="card-title">
+                    Hasil Kelompok Token
+                </div>
+                <div class="table-container">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">Baris</th>
+                                <th>Lexeme (Teks Asli)</th>
+                                <th>Kategori Sifat String</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody">
+                            <!-- Results will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="lexer.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const lexer = new Lexer();
+            const codeInput = document.getElementById('codeInput');
+            const languageSelect = document.getElementById('languageSelect');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const resultsSection = document.getElementById('resultsSection');
+            const resultsBody = document.getElementById('resultsBody');
+
+            analyzeBtn.addEventListener('click', () => {
+                const code = codeInput.value.trim();
+                const language = languageSelect.value;
+
+                if (!code) {
+                    alert('Silakan masukkan kode program terlebih dahulu.');
+                    return;
+                }
+
+                const results = lexer.analyze(code, language);
+                displayResults(results);
+            });
+
+            function displayResults(results) {
+                resultsBody.innerHTML = '';
+                
+                if (results.length === 0) {
+                    resultsBody.innerHTML = '<tr><td colspan="3" class="empty-results">Tidak ada token yang ditemukan.</td></tr>';
+                } else {
+                    results.forEach(token => {
+                        const row = document.createElement('tr');
+                        
+                        const isError = token.category.includes('ERROR');
+                        const badgeClass = isError ? 'error-badge' : 'category-badge';
+
+                        const tdLine = document.createElement('td');
+                        const lineBadge = document.createElement('span');
+                        lineBadge.className = 'badge line-badge';
+                        lineBadge.textContent = token.line;
+                        tdLine.appendChild(lineBadge);
+
+                        const tdLexeme = document.createElement('td');
+                        const codeElem = document.createElement('code');
+                        codeElem.className = 'lexeme-text';
+                        codeElem.textContent = token.lexeme;
+                        tdLexeme.appendChild(codeElem);
+
+                        const tdCategory = document.createElement('td');
+                        const catBadge = document.createElement('span');
+                        catBadge.className = `badge ${badgeClass}`;
+                        catBadge.textContent = token.category;
+                        tdCategory.appendChild(catBadge);
+
+                        row.appendChild(tdLine);
+                        row.appendChild(tdLexeme);
+                        row.appendChild(tdCategory);
+                        
+                        resultsBody.appendChild(row);
+                    });
+                }
+
+                resultsSection.classList.add('active');
+                
+                // Smooth scroll to results
+                setTimeout(() => {
+                    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
