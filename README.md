@@ -1,4 +1,4 @@
-# OTOMATA---TUGAS-PRAKTIKUM-1
+# OTOMATA---TUGAS-PRAKTIKUM-1--KELOMPOK B06
 
 | Name           | NRP        | 
 | ---            | ---        | 
